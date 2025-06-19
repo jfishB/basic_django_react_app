@@ -1,11 +1,11 @@
 import { useState } from "react";
 import api from "../api";
 import { useNavigate } from "react-router-dom";
-import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
+import { ACCESS_TOKEN } from "../constants";
 import "../styles/Form.css"
 import LoadingIndicator from "./LoadingIndicator";
 
-function Form({ route, method }) {
+function Form({ route, method, onSuccess }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,18 +18,15 @@ function Form({ route, method }) {
     e.preventDefault();
 
     try {
-        const res = await api.post(route, {username, password})
-        if (method === "login") {
-            localStorage.setItem(ACCESS_TOKEN, res.data.access);
-            localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
-            navigate("/")
-        } else {
-            navigate("/login")
-        }
+      const response = await api.post(route, { username, password });
+      if (method === "login") {
+        localStorage.setItem(ACCESS_TOKEN, response.data.access);
+      }
+      onSuccess();
     } catch (error) {
-        alert(error)
+      alert(`${method} failed!`);
     } finally {
-        setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -58,4 +55,4 @@ function Form({ route, method }) {
   );
 }
 
-export default Form
+export default Form;
